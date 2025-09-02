@@ -1,24 +1,32 @@
 package net.stjconnector;
 
 import com.eetrust.label.LabelOperator;
+import net.stjconnector.exception.DataTransferException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 public class UploadUtil {
+    private static final Logger logger = LoggerFactory.getLogger(UploadUtil.class);
     private static final String filePath = "settings.xml";
 
-    public static void upload(String iPath, String oPath, String fName) {
+    /**
+     * 上传文件并处理
+     *
+     * @param iPath 输入文件路径
+     * @param oPath 输出文件路径
+     * @param fName 文件名
+     * @throws DataTransferException 数据传输异常
+     */
+    public static void upload(String iPath, String oPath, String fName) throws DataTransferException {
         InputStream input = null;
         OutputStream output = null;
         try {
             String serverIp = XmlUtil.readElementTextFromFile(filePath, "platFormAddress");
             int serverPort = Integer.parseInt(XmlUtil.readElementTextFromFile(filePath, "platFormPort"));
             LabelOperator labelOperator = new LabelOperator(serverIp, serverPort);
-            //设置本地工程编码格式（UTF_8、GBK），默认为UTF_8
-            //labelOperator.setCharacter(CharacterEnums.UTF_8);
+            
             //应用系统用户唯一标识
             String userId = XmlUtil.readElementTextFromFile(filePath, "platFormUserId");
             //业务系统服务器文件路径
@@ -30,10 +38,28 @@ public class UploadUtil {
             short fileForm = 0;
             labelOperator.uploadHandle(userId, input, output, fName,
                     labelXml, state, fileForm);
-            System.out.println("处理成功");
+            logger.info("文件处理成功: {}", fName);
         } catch (Exception e) {
-            System.out.println("处理异常：" + e.getMessage());
-            e.printStackTrace();
+            logger.error("文件处理异常: {}", fName, e);
+            throw new DataTransferException("文件处理失败: " + fName, e);
+        } finally {
+            closeQuietly(input);
+            closeQuietly(output);
+        }
+    }
+    
+    /**
+     * 安静地关闭流
+     *
+     * @param closeable 可关闭对象
+     */
+    private static void closeQuietly(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException e) {
+                logger.warn("关闭流时发生异常", e);
+            }
         }
     }
 }

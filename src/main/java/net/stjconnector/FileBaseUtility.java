@@ -1,29 +1,48 @@
 package net.stjconnector;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import net.stjconnector.exception.FileOperationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FileBaseUtility {
-    public static byte[] getBytes(String filePath) {
-        byte[] buffer = null;
+    private static final Logger logger = LoggerFactory.getLogger(FileBaseUtility.class);
+    
+    /**
+     * 读取文件内容为字节数组
+     * 使用NIO优化性能
+     *
+     * @param filePath 文件路径
+     * @return 文件字节数组
+     * @throws FileOperationException 文件操作异常
+     */
+    public static byte[] getBytes(String filePath) throws FileOperationException {
         try {
-            File file = new File(filePath);
-            FileInputStream fis = new FileInputStream(file);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
-            byte[] b = new byte[1000];
-            int n;
-            while ((n = fis.read(b)) != -1) {
-                bos.write(b, 0, n);
-            }
-            fis.close();
-            bos.close();
-            buffer = bos.toByteArray();
+            Path path = Paths.get(filePath);
+            return Files.readAllBytes(path);
         } catch (IOException e) {
-            e.printStackTrace();
-            ;
+            logger.error("读取文件失败: {}", filePath, e);
+            throw new FileOperationException("读取文件失败: " + filePath, e);
         }
-        return buffer;
+    }
+    
+    /**
+     * 将字节数组写入文件
+     *
+     * @param data     数据
+     * @param filePath 文件路径
+     * @throws FileOperationException 文件操作异常
+     */
+    public static void writeBytesToFile(byte[] data, String filePath) throws FileOperationException {
+        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(filePath))) {
+            os.write(data);
+        } catch (IOException e) {
+            logger.error("写入文件失败: {}", filePath, e);
+            throw new FileOperationException("写入文件失败: " + filePath, e);
+        }
     }
 }

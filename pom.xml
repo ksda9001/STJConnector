@@ -103,6 +103,11 @@
             <version>1.10</version>
             <systemPath>${project.basedir}/libs/LabelOperator2033_20220305_bytes.jar</systemPath>
         </dependency>
+        <!-- 添加缺失的日志实现 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -111,7 +116,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>net.stjconnector.StjConnectorApplication</mainClass>
+                    <mainClass>net.stjconnector.StjConnector2Application</mainClass>
                     <!--maven将引用的本地 jar 包一起打包-->
                     <includeSystemScope>true</includeSystemScope>
                 </configuration>
