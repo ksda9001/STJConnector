@@ -12,12 +12,12 @@ import java.io.File;
  * 用于从XML文件中读取指定标签的内容
  */
 public class XmlUtil {
-    
+
     /**
      * 从XML文件中读取指定标签的文本内容
-     * 
+     *
      * @param filePath XML文件路径
-     * @param tagName 要读取的标签名称
+     * @param tagName  要读取的标签名称
      * @return 标签中的文本内容
      * @throws Exception 解析异常
      */
@@ -26,7 +26,7 @@ public class XmlUtil {
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.parse(new File(filePath));
         document.getDocumentElement().normalize();
-        
+
         NodeList nodeList = document.getElementsByTagName(tagName);
         if (nodeList.getLength() > 0) {
             return nodeList.item(0).getTextContent();

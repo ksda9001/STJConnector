@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -95,6 +95,13 @@
             <scope>system</scope>
             <version>1.7.25</version>
             <systemPath>${project.basedir}/libs/slf4j-api-1.7.25.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <scope>system</scope>
+            <version>1.10</version>
+            <systemPath>${project.basedir}/libs/LabelOperator2033_20220305_bytes.jar</systemPath>
         </dependency>
     </dependencies>
 

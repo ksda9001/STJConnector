@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<setting>
+    <!--    接收端ip地址-->
+    <address>127.0.0.1</address>
+    <!--    接收端端口号-->
+    <port>20000</port>
+    <!--    客户端标识-->
+    <clientId>test</clientId>
+    <!--    令牌-->
+    <token>123456</token>
+    <!--    生成hashCode-->
+    <hashCode>hashCode</hashCode>
+    <!--    扩展参数-->
+    <extendConfig>extendConfig</extendConfig>
+    <!--    任务发起人ID-->
+    <starterID>f0971590-62f3-4810-89a5-ba9a8d49ce56</starterID>
+    <!--    任务名称-->
+    <title>title</title>
+    <!--    任务备注-->
+    <note>note</note>
+    <!--    密标信息-->
+    <mbInfoJson>{"critical": "1","userID": "4","test": "000"}</mbInfoJson>
+    <!--    dts内部扩展参数-->
+    <processExtendConfig>processExtendConfig</processExtendConfig>
+    <!--    新平台中转-->
+    <platFormAddress>127.0.0.1</platFormAddress>
+    <platFormPort>20000</platFormPort>
+    <platFormUserId>testId</platFormUserId>
+    <platFormLabel>
+        <secAttrib>
+            <secrecy>5</secrecy>
+            <status>5</status>
+        </secAttrib>
+    </platFormLabel>
+</setting>

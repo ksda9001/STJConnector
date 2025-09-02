@@ -1,11 +1,14 @@
 package net.stjconnector;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class FileBaseUtility {
-    public static byte[] getBytes(String filePath){
+    public static byte[] getBytes(String filePath) {
         byte[] buffer = null;
-        try{
+        try {
             File file = new File(filePath);
             FileInputStream fis = new FileInputStream(file);
             ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
@@ -17,10 +20,9 @@ public class FileBaseUtility {
             fis.close();
             bos.close();
             buffer = bos.toByteArray();
-        }catch(FileNotFoundException e){
+        } catch (IOException e) {
             e.printStackTrace();
-        }catch (IOException e){
-            e.printStackTrace();;
+            ;
         }
         return buffer;
     }
