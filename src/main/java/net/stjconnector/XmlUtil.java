@@ -4,12 +4,19 @@ import net.stjconnector.exception.XmlProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.StringWriter;
 
 /**
  * XML读取工具类
@@ -19,11 +26,11 @@ public class XmlUtil {
     private static final Logger logger = LoggerFactory.getLogger(XmlUtil.class);
 
     /**
-     * 从XML文件中读取指定标签的文本内容
+     * 从XML文件中读取指定标签的完整内容（包括所有子标签）
      *
      * @param filePath XML文件路径
      * @param tagName  要读取的标签名称
-     * @return 标签中的文本内容
+     * @return 标签的完整XML内容（包括标签本身和所有子标签）
      * @throws XmlProcessingException 解析异常
      */
     public static String readElementTextFromFile(String filePath, String tagName) throws XmlProcessingException {
@@ -39,12 +46,30 @@ public class XmlUtil {
 
             NodeList nodeList = document.getElementsByTagName(tagName);
             if (nodeList.getLength() > 0) {
-                return nodeList.item(0).getTextContent();
+                Node node = nodeList.item(0);
+                return nodeToString(node);
             }
             return null;
         } catch (Exception e) {
             logger.error("解析XML文件失败: {} 标签: {}", filePath, tagName, e);
             throw new XmlProcessingException("解析XML文件失败: " + filePath + " 标签: " + tagName, e);
         }
+    }
+    
+    /**
+     * 将Node节点转换为字符串
+     *
+     * @param node 要转换的节点
+     * @return 节点的XML字符串表示
+     * @throws Exception 转换异常
+     */
+    private static String nodeToString(Node node) throws Exception {
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.setOutputProperty(OutputKeys.INDENT, "no");
+        StringWriter writer = new StringWriter();
+        transformer.transform(new DOMSource(node), new StreamResult(writer));
+        return writer.toString();
     }
 }
