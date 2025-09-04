@@ -26,11 +26,11 @@ public class XmlUtil {
     private static final Logger logger = LoggerFactory.getLogger(XmlUtil.class);
 
     /**
-     * 从XML文件中读取指定标签的完整内容（包括所有子标签）
+     * 从XML文件中读取指定标签的完整内容（包括所有子标签，但不包括标签本身）
      *
      * @param filePath XML文件路径
      * @param tagName  要读取的标签名称
-     * @return 标签的完整XML内容（包括标签本身和所有子标签）
+     * @return 标签内的完整XML内容（不包括标签本身，但包括所有子标签）
      * @throws XmlProcessingException 解析异常
      */
     public static String readElementTextFromFile(String filePath, String tagName) throws XmlProcessingException {
@@ -47,7 +47,7 @@ public class XmlUtil {
             NodeList nodeList = document.getElementsByTagName(tagName);
             if (nodeList.getLength() > 0) {
                 Node node = nodeList.item(0);
-                return nodeToString(node);
+                return innerNodeToString(node);
             }
             return null;
         } catch (Exception e) {
@@ -57,19 +57,29 @@ public class XmlUtil {
     }
     
     /**
-     * 将Node节点转换为字符串
+     * 将Node节点的子节点转换为字符串
      *
      * @param node 要转换的节点
-     * @return 节点的XML字符串表示
+     * @return 节点内子节点的XML字符串表示
      * @throws Exception 转换异常
      */
-    private static String nodeToString(Node node) throws Exception {
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        transformer.setOutputProperty(OutputKeys.INDENT, "no");
-        StringWriter writer = new StringWriter();
-        transformer.transform(new DOMSource(node), new StreamResult(writer));
-        return writer.toString();
+    private static String innerNodeToString(Node node) throws Exception {
+        StringBuilder result = new StringBuilder();
+        NodeList childNodes = node.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node child = childNodes.item(i);
+            if (child.getNodeType() == Node.TEXT_NODE) {
+                result.append(child.getTextContent());
+            } else {
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                transformer.setOutputProperty(OutputKeys.INDENT, "no");
+                StringWriter writer = new StringWriter();
+                transformer.transform(new DOMSource(child), new StreamResult(writer));
+                result.append(writer.toString());
+            }
+        }
+        return result.toString();
     }
 }
