@@ -28,6 +28,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public class XmlUtil {
     private static final Logger logger = LoggerFactory.getLogger(XmlUtil.class);
 
+    // XML解析器功能常量
+    private static final String FEATURE_DISALLOW_DOCTYPE = "http://apache.org/xml/features/disallow-doctype-decl";
+    private static final String FEATURE_EXTERNAL_GENERAL_ENTITIES = "http://xml.org/sax/features/external-general-entities";
+    private static final String FEATURE_EXTERNAL_PARAMETER_ENTITIES = "http://xml.org/sax/features/external-parameter-entities";
+
     // 缓存DocumentBuilderFactory实例，因为它的创建成本很高
     private static final AtomicReference<DocumentBuilderFactory> FACTORY_CACHE = new AtomicReference<>();
 
@@ -50,14 +55,23 @@ public class XmlUtil {
         if (factory == null) {
             factory = DocumentBuilderFactory.newInstance();
             try {
-                // 设置安全特性
+                // 设置基本安全特性
                 factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-                factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-                factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-                factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
                 factory.setNamespaceAware(true);
                 factory.setExpandEntityReferences(false);
                 factory.setXIncludeAware(false);
+
+                // 尝试设置额外的安全特性
+                trySetFeature(factory, "http://apache.org/xml/features/disallow-doctype-decl", true);
+                trySetFeature(factory, "http://xml.org/sax/features/external-general-entities", false);
+                trySetFeature(factory, "http://xml.org/sax/features/external-parameter-entities", false);
+
+                // 设置属性以禁用外部DTD和实体
+                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+
+                // 禁用DOCTYPE声明
+                factory.setValidating(false);
 
                 // 尝试原子性地设置缓存
                 if (!FACTORY_CACHE.compareAndSet(null, factory)) {
@@ -211,6 +225,23 @@ public class XmlUtil {
             }
         }
         return estimate;
+    }
+
+    /**
+     * 获取或创建缓存的Transformer实例
+     */
+    /**
+     * 尝试设置XML解析器的功能特性，如果不支持则记录警告
+     * @param factory XML解析器工厂
+     * @param feature 功能特性名称
+     * @param value 特性值
+     */
+    private static void trySetFeature(DocumentBuilderFactory factory, String feature, boolean value) {
+        try {
+            factory.setFeature(feature, value);
+        } catch (Exception e) {
+            logger.warn("XML解析器不支持功能: {}，这可能会降低安全性", feature);
+        }
     }
 
     /**
