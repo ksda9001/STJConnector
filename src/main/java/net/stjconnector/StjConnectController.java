@@ -28,7 +28,7 @@ import java.util.Base64;
 @Controller
 public class StjConnectController {
     private static final Logger logger = LoggerFactory.getLogger(StjConnectController.class);
-    private static final String filePath = "settings.xml";
+    private static final String settingFilePath = "settings.xml";
 
     /**
      * 发送文件到DTS
@@ -42,13 +42,13 @@ public class StjConnectController {
     public static boolean sendToDTS(String filePath, String starterID,
                                     String secure) throws StjException {
         try {
-            String address = XmlUtil.readElementTextFromFile(filePath, "address");
+            String address = XmlUtil.readElementTextFromFile(settingFilePath, "address");
             //接收端端口
-            int port = Integer.parseInt(XmlUtil.readElementTextFromFile(filePath, "port"));
+            int port = Integer.parseInt(XmlUtil.readElementTextFromFile(settingFilePath, "port"));
             //客户端标识
-            String clientId = XmlUtil.readElementTextFromFile(filePath, "clientId");
+            String clientId = XmlUtil.readElementTextFromFile(settingFilePath, "clientId");
             //令牌（必填）
-            String token = XmlUtil.readElementTextFromFile(filePath, "token");
+            String token = XmlUtil.readElementTextFromFile(settingFilePath, "token");
             //任务id（必填），任务唯一标识，不可重复
             String dataId = System.currentTimeMillis() + "";
             //密标信息（非必填）
@@ -65,15 +65,15 @@ public class StjConnectController {
                 mbInfoJson = "{\"secrecy\":[4]}";
             }
             //生成hashCode（非必填），根据自身需求生成hashCode，用于完整性校验
-            String hashCode = XmlUtil.readElementTextFromFile(filePath, "hashCode");
+            String hashCode = XmlUtil.readElementTextFromFile(settingFilePath, "hashCode");
             //扩展参数（非必填）
-            String extendConfig = XmlUtil.readElementTextFromFile(filePath, "extendConfig");
+            String extendConfig = XmlUtil.readElementTextFromFile(settingFilePath, "extendConfig");
             //任务名称（非必填）
-            String title = XmlUtil.readElementTextFromFile(filePath, "title");
+            String title = XmlUtil.readElementTextFromFile(settingFilePath, "title");
             //任务备注（非必填）
-            String note = XmlUtil.readElementTextFromFile(filePath, "note");
+            String note = XmlUtil.readElementTextFromFile(settingFilePath, "note");
             //dts内部扩展参数（非必填）
-            String processExtendConfig = XmlUtil.readElementTextFromFile(filePath, "processExtendConfig");
+            String processExtendConfig = XmlUtil.readElementTextFromFile(settingFilePath, "processExtendConfig");
 
             //获取传输文件
             File transFile = new File(filePath);
