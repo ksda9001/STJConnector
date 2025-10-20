@@ -123,12 +123,7 @@ public class StjConnectController {
             TxtWriter writer = new TxtWriter();
             writer.writeDataToFile(data, filePath);
             
-            //引入新的加密方式
-            UploadUtil.upload(filePath, oPath, filePath);
-            
-            boolean success = sendToDTS(oPath, starterID, secure);
-            cleanupFile(filePath);
-            cleanupFile(oPath);
+            boolean success = fileSend(filePath, oPath, starterID, secure);
             
             return success ? "{\"status\":\"success\",\"message\":\"发送成功\"}" : 
                            "{\"status\":\"error\",\"message\":\"发送失败\"}";
@@ -151,12 +146,7 @@ public class StjConnectController {
             TxtWriter writer = new TxtWriter();
             writer.writeDataToFile(xml, filePath);
             
-            //引入新的加密方式
-            UploadUtil.upload(filePath, oPath, filePath);
-            
-            boolean success = sendToDTS(oPath, starterID, secure);
-            cleanupFile(filePath);
-            cleanupFile(oPath);
+            boolean success = fileSend(filePath, oPath, starterID, secure);
             
             return success ? "{\"status\":\"success\",\"message\":\"发送成功\"}" : 
                            "{\"status\":\"error\",\"message\":\"发送失败\"}";
@@ -178,13 +168,8 @@ public class StjConnectController {
         try {
             byte[] bytes = Base64.getDecoder().decode(base64);
             FileBaseUtility.writeBytesToFile(bytes, filePath);
-            
-            //引入新的加密方式
-            UploadUtil.upload(filePath, oPath, filePath);
-            
-            boolean success = sendToDTS(oPath, starterID, secure);
-            cleanupFile(filePath);
-            cleanupFile(oPath);
+
+            boolean success = fileSend(filePath, oPath, starterID, secure);
             
             return success ? "{\"status\":\"success\",\"message\":\"发送成功\"}" : 
                            "{\"status\":\"error\",\"message\":\"文件发送失败\"}";
@@ -212,5 +197,25 @@ public class StjConnectController {
         } catch (Exception e) {
             logger.warn("删除临时文件失败: {}", filePath, e);
         }
+    }
+
+    // 文件发送
+    private boolean fileSend(String filePath, String oPath, String starterID,
+                             String secure) {
+        boolean success = false;
+        try{
+            if(XmlUtil.readElementTextFromFile(settingFilePath, "featureV2").equals("enable")){
+                UploadUtil.upload(filePath, oPath, filePath);
+                success = sendToDTS(oPath, starterID, secure);
+                cleanupFile(filePath);
+                cleanupFile(oPath);
+            }else if(XmlUtil.readElementTextFromFile(settingFilePath, "featureV2").equals("disable")){
+                success = sendToDTS(filePath, starterID, secure);
+                cleanupFile(filePath);
+            }
+        } catch (StjException e) {
+            logger.error("文件发送失败！", e);
+        }
+        return success;
     }
 }
